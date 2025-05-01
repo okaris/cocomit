@@ -62,7 +62,7 @@ func main() {
 				continue
 			}
 			cost := processor.EstimateCost(processor.EstimateEffort(int64(locDelta), eaf), float64(hourlyWage), overhead)
-			fmt.Printf("%s%s%s | %s%s%s | %s%d LOC%s | %s%.2f PM%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorYellow, locDelta, colorReset, colorYellow, processor.EstimateEffort(int64(locDelta), eaf), colorReset, colorMagenta, cost, colorReset)
+			fmt.Printf("%s%s%s | %s%s%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorMagenta, cost, colorReset)
 		}
 	}
 }
