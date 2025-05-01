@@ -2,6 +2,8 @@
 
 **Estimate the cost of every commit in your Git history using COCOMO.**
 
+<img width="622" alt="image" src="https://github.com/user-attachments/assets/1f98f24a-77ca-4f10-b2d8-d60c34ea3b75" />
+
 ---
 
 ## Features
