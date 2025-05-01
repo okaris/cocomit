@@ -20,19 +20,19 @@ func main() {
 
 	fmt.Printf("%s#cocomit%s\n", colorCyan, colorReset)
 	fmt.Println("Assumptions:")
-	fmt.Printf("%s- Model:        Basic COCOMO (Organic)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Effort:       Effort = 2.4 × (SLOC / 1000)^1.05%s\n", colorYellow, colorReset)
+	fmt.Printf("%s- Model:        Single Developer Linear Estimate%s\n", colorYellow, colorReset)
+	fmt.Printf("%s- Effort:       Effort = (SLOC / 50) hours → PM = hours / 152%s\n", colorYellow, colorReset)
 	fmt.Printf("%s- EAF:          1.0 (nominal)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Annual Wage:  $120,000%s\n", colorYellow, colorReset)
+	fmt.Printf("%s- Hourly Wage:  $65.79 ($120K/year)%s\n", colorYellow, colorReset)
 	fmt.Printf("%s- Overhead:     1.3 (benefits, infra, etc.)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Cost:         Effort × Monthly Wage × Overhead%s\n", colorYellow, colorReset)
+	fmt.Printf("%s- Cost:         Effort × Hours × Hourly Wage × Overhead%s\n", colorYellow, colorReset)
 
 	fmt.Println("\n")
 	repo := "."
 
 	pageSize := 50
 	eaf := 1.0
-	averageWage := int64(120000)
+	hourlyWage := int64(120000) / 160 / 12
 	overhead := 1.3
 
 	for i := 0; ; i++ {
@@ -61,9 +61,8 @@ func main() {
 			if locDelta == 0 {
 				continue
 			}
-			cost := processor.EstimateCost(processor.EstimateEffort(int64(locDelta), eaf), averageWage, overhead)
-
-			fmt.Printf("%s%s%s | %s%s%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorMagenta, cost, colorReset)
+			cost := processor.EstimateCost(processor.EstimateEffort(int64(locDelta), eaf), float64(hourlyWage), overhead)
+			fmt.Printf("%s%s%s | %s%s%s | %s%d LOC%s | %s%.2f PM%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorYellow, locDelta, colorReset, colorYellow, processor.EstimateEffort(int64(locDelta), eaf), colorReset, colorMagenta, cost, colorReset)
 		}
 	}
 }

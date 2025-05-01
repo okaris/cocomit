@@ -14,13 +14,16 @@ var projectType = map[string][]float64{
 	"embedded":      {3.6, 1.20, 2.5, 0.32},
 }
 
-func EstimateCost(effortApplied float64, averageWage int64, overhead float64) float64 {
-	return effortApplied * float64(averageWage/12) * overhead
+func EstimateCost(effortApplied float64, hourlyWage float64, overhead float64) float64 {
+	hours := effortApplied * 152 // 152 hours per person-month
+	return hours * hourlyWage * overhead
 }
 
 func EstimateEffort(sloc int64, eaf float64) float64 {
-	return projectType[CocomoProjectType][0] *
-		math.Pow(float64(sloc)/1000, projectType[CocomoProjectType][1]) * eaf
+	// Assume 1 developer writing 50 LOC/hour
+	// 1 person-month = 152 hours
+	hours := float64(sloc) / 50.0
+	return (hours / 152.0) * eaf
 }
 
 func EstimateScheduleMonths(effortApplied float64) float64 {
