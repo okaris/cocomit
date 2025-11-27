@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -22,7 +23,8 @@ func main() {
 	colorRed := "\033[31m"
 	colorMagenta := "\033[35m"
 
-	fmt.Printf("%s#cocomit%s\n", colorCyan, colorReset)
+	repoName := getRepoName()
+	fmt.Printf("%s#cocomit%s %s\n", colorCyan, colorReset, repoName)
 	if !*totalOnly {
 		fmt.Println("Assumptions:")
 		fmt.Printf("%s- Model:        Single Developer Linear Estimate%s\n", colorYellow, colorReset)
@@ -142,4 +144,13 @@ func parseLocChange(line string) (int, int) {
 		}
 	}
 	return added, removed
+}
+
+func getRepoName() string {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return filepath.Base(strings.TrimSpace(string(out)))
 }
