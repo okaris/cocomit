@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -10,6 +11,9 @@ import (
 )
 
 func main() {
+	totalOnly := flag.Bool("total", false, "show only the total LoC and cost")
+	flag.Parse()
+
 	// ANSI color codes
 	colorReset := "\033[0m"
 	colorCyan := "\033[36m"
@@ -19,15 +23,17 @@ func main() {
 	colorMagenta := "\033[35m"
 
 	fmt.Printf("%s#cocomit%s\n", colorCyan, colorReset)
-	fmt.Println("Assumptions:")
-	fmt.Printf("%s- Model:        Single Developer Linear Estimate%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Effort:       Effort = (SLOC / 50) hours → PM = hours / 152%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- EAF:          1.0 (nominal)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Hourly Wage:  $65.79 ($120K/year)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Overhead:     1.3 (benefits, infra, etc.)%s\n", colorYellow, colorReset)
-	fmt.Printf("%s- Cost:         Effort × Hours × Hourly Wage × Overhead%s\n", colorYellow, colorReset)
+	if !*totalOnly {
+		fmt.Println("Assumptions:")
+		fmt.Printf("%s- Model:        Single Developer Linear Estimate%s\n", colorYellow, colorReset)
+		fmt.Printf("%s- Effort:       Effort = (SLOC / 50) hours → PM = hours / 152%s\n", colorYellow, colorReset)
+		fmt.Printf("%s- EAF:          1.0 (nominal)%s\n", colorYellow, colorReset)
+		fmt.Printf("%s- Hourly Wage:  $65.79 ($120K/year)%s\n", colorYellow, colorReset)
+		fmt.Printf("%s- Overhead:     1.3 (benefits, infra, etc.)%s\n", colorYellow, colorReset)
+		fmt.Printf("%s- Cost:         Effort × Hours × Hourly Wage × Overhead%s\n", colorYellow, colorReset)
+		fmt.Println()
+	}
 
-	fmt.Println("\n")
 	repo := "."
 
 	pageSize := 50
@@ -35,12 +41,14 @@ func main() {
 	hourlyWage := int64(120000) / 160 / 12
 	overhead := 1.3
 
+	var totalLoc int64
+	var totalCost float64
+
 	for i := 0; ; i++ {
 		skip := i * pageSize
 
 		entries := gitLog(repo, skip, pageSize)
 		if len(entries) == 0 {
-			fmt.Printf("%sNo more entries.%s\n", colorRed, colorReset)
 			break
 		}
 
@@ -62,9 +70,20 @@ func main() {
 				continue
 			}
 			cost := processor.EstimateCost(processor.EstimateEffort(int64(locDelta), eaf), float64(hourlyWage), overhead)
-			fmt.Printf("%s%s%s | %s%s%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorMagenta, cost, colorReset)
+			if !*totalOnly {
+				fmt.Printf("%s%s%s | %s%s%s | %s$%.2f%s\n", colorGreen, hash[0:7], colorReset, colorCyan, date, colorReset, colorMagenta, cost, colorReset)
+			}
+
+			totalLoc += int64(locDelta)
+			totalCost += cost
 		}
 	}
+
+	if !*totalOnly {
+		fmt.Println("\n" + strings.Repeat("─", 40))
+	}
+	fmt.Printf("%sTotal LoC:%s  %d\n", colorCyan, colorReset, totalLoc)
+	fmt.Printf("%sTotal Cost:%s %s$%.2f%s\n", colorCyan, colorReset, colorMagenta, totalCost, colorReset)
 }
 
 func gitLog(repoPath string, skip, limit int) []string {

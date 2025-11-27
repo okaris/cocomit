@@ -1,6 +1,6 @@
 # cocomit
 
-**Estimate the cost of every commit in your Git history using COCOMO.**
+**Estimate the cost of every commit in your Git history.**
 
 <img width="622" alt="image" src="https://github.com/user-attachments/assets/1f98f24a-77ca-4f10-b2d8-d60c34ea3b75" />
 
@@ -9,19 +9,20 @@
 ## Features
 
 - Parses Git history and diffs
-- Calculates per-commit cost based on COCOMO (organic mode)
+- Calculates per-commit cost based on lines of code
+- Shows total LoC and cost for the entire repo
 - No dependencies beyond Git and Go
 
 ---
 
-## COCOMO Assumptions
+## Assumptions
 
-- **Model**: Basic COCOMO (Organic)
-- **Effort**: `Effort = 2.4 × (SLOC / 1000)^1.05`
+- **Model**: Single Developer Linear Estimate
+- **Effort**: `Effort = (SLOC / 50) hours`
 - **EAF**: 1.0 (nominal)
-- **Annual Developer Salary**: $120,000
+- **Hourly Wage**: $65.79 ($120K/year)
 - **Overhead Multiplier**: 1.3 (benefits, infra, admin)
-- **Cost**: `Cost = Effort × (Salary / 12) × Overhead`
+- **Cost**: `Cost = Effort × Hourly Wage × Overhead`
 
 ---
 
@@ -44,24 +45,44 @@ Run inside any Git repo:
 cocomit
 ```
 
-⸻
+Show only totals (no per-commit output):
+
+```bash
+cocomit -total
+```
+
+---
 
 ### Output Example
 
 ```bash
+#cocomit
 Assumptions:
-Model:        Basic COCOMO (Organic)
-Effort:       Effort = 2.4 × (SLOC / 1000)^1.05
-EAF:          1.0 (nominal)
-Annual Wage:  $120,000
-Overhead:     1.3
+- Model:        Single Developer Linear Estimate
+- Effort:       Effort = (SLOC / 50) hours → PM = hours / 152
+- EAF:          1.0 (nominal)
+- Hourly Wage:  $65.79 ($120K/year)
+- Overhead:     1.3 (benefits, infra, etc.)
+- Cost:         Effort × Hours × Hourly Wage × Overhead
 
-d0fc851cd302 — refactor parser logic — $98,677.69
-265f3027f28f — fix spacing — $1,854.77
+d0fc851 | refactor parser logic | $98.67
+265f302 | fix spacing | $18.54
+
+────────────────────────────────────────
+Total LoC:  12345
+Total Cost: $1,234.56
 ```
 
-⸻
+With `-total` flag:
 
-License
+```bash
+#cocomit
+Total LoC:  12345
+Total Cost: $1,234.56
+```
+
+---
+
+## License
 
 MIT
