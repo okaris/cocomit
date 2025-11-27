@@ -28,7 +28,7 @@
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR-USER/cocomit.git
+git clone https://github.com/okaris/cocomit.git
 cd cocomit
 go build -o cocomit
 sudo mv cocomit /usr/local/bin/
